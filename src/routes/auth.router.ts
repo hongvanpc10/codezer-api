@@ -3,6 +3,6 @@ import { authController } from '../controllers'
 
 const authRouter = express.Router()
 
-authRouter.post('/', authController.login)
+authRouter.post('/register', authController.register)
 
 export default authRouter
