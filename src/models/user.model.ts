@@ -25,10 +25,9 @@ const userSchema = new mongoose.Schema(
 			required: true,
 			trim: true,
 		},
-		username: {
+		slug: {
 			type: String,
-			required: true,
-			unique: true,
+			slug: ['lastName', 'firstName'],
 		},
 		bio: {
 			type: String,
