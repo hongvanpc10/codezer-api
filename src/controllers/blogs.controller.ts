@@ -12,7 +12,7 @@ export const create = async (req: Request, res: Response) => {
 			content,
 			thumb,
 			categories,
-			author: '63931241f799eb95abd4b604',
+			author: '639450d5bd726e3cdc5ac7ae',
 		})
 
 		await blog.save()
