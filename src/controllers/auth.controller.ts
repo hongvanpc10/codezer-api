@@ -8,6 +8,7 @@ import {
 	generateActiveToken,
 	generateRefreshToken,
 	verifyActiveToken,
+	verifyRefreshToken,
 } from '../utils/token'
 
 export const register = async (req: Request, res: Response) => {
@@ -114,9 +115,15 @@ export const login = async (req: Request, res: Response) => {
 		const refreshToken = generateRefreshToken({ id: user._id })
 		const accessToken = generateAccessToken({ id: user._id })
 
+		res.cookie('refreshToken', refreshToken, {
+			maxAge: 30 * 24 * 60 * 60 * 1000,
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production',
+			path: '/api/auth/refresh-token',
+		})
+
 		return res.json({
 			message: 'Logged in successfully',
-			refreshToken,
 			accessToken,
 		})
 	} catch (error: any) {
@@ -124,6 +131,59 @@ export const login = async (req: Request, res: Response) => {
 			message: error.message,
 			error,
 			errorCode: 'ali5001',
+		})
+	}
+}
+
+export const logout = async (req: Request, res: Response) => {
+	try {
+		res.clearCookie('refreshToken', {
+			path: '/api/auth/refresh-token',
+		})
+
+		return res.json({
+			message: 'Logged out successfully',
+		})
+	} catch (error: any) {
+		return res.status(500).json({
+			message: error.message,
+			error,
+			errorCode: 'alo5001',
+		})
+	}
+}
+
+export interface Decoded {
+	id: string
+	iat: number
+	exp: number
+}
+
+export const refreshToken = async (req: Request, res: Response) => {
+	try {
+		const refreshToken = req.cookies.refreshToken
+
+		if (!refreshToken)
+			return res.status(400).json({ message: 'User not logged in' })
+
+		const decoded = <Decoded>verifyRefreshToken(refreshToken)
+
+		const user = await User.findById(decoded.id).select('-password')
+
+		if (!user) return res.status(401).json({ message: 'User not found' })
+
+		const accessToken = generateAccessToken({ id: user._id })
+
+		return res.json({
+			message: 'Refresh token successfully',
+			data: user,
+			accessToken,
+		})
+	} catch (error: any) {
+		return res.status(500).json({
+			message: error.message,
+			error,
+			errorCode: 'art5001',
 		})
 	}
 }

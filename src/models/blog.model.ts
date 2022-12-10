@@ -45,6 +45,10 @@ const blogSchema = new mongoose.Schema(
 				ref: 'User',
 			},
 		],
+		isPinned: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	{ timestamps: true }
 )

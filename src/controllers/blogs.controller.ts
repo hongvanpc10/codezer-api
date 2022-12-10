@@ -1,8 +1,10 @@
 import { Request, Response } from 'express'
 import mongoose from 'mongoose'
+import { RequestWithAuth } from '../middleware/auth'
 import Blog from '../models/blog.model'
+import User from '../models/user.model'
 
-export const create = async (req: Request, res: Response) => {
+export const create = async (req: RequestWithAuth, res: Response) => {
 	try {
 		const { title, description, content, thumb, categories } = req.body
 
@@ -12,7 +14,7 @@ export const create = async (req: Request, res: Response) => {
 			content,
 			thumb,
 			categories,
-			author: '639450d5bd726e3cdc5ac7ae',
+			author: req.user._id,
 		})
 
 		await blog.save()
@@ -387,8 +389,28 @@ export const getBlogsByUser = async (req: Request, res: Response) => {
 	}
 }
 
-export const update = async (req: Request, res: Response) => {
+export const getPinnedBlogs = async (req: Request, res: Response) => {
 	try {
+		const blogs = await Blog.find({ isPinned: true })
+			.populate('author categories', '-password')
+			.sort('-createdAt')
+			.limit(6)
+
+		return res.json({ message: 'Get blogs successfully', data: blogs })
+	} catch (error: any) {
+		return res.status(500).json({
+			message: error.message,
+			error,
+			errorCode: 'bpb5001',
+		})
+	}
+}
+
+export const update = async (req: RequestWithAuth, res: Response) => {
+	try {
+		if (req.user._id !== req.params.id)
+			return res.status(400).json({ message: 'Not author' })
+
 		const { title, thumb, description, content, categories } = req.body
 
 		const blog = await Blog.findByIdAndUpdate(
@@ -407,9 +429,12 @@ export const update = async (req: Request, res: Response) => {
 	}
 }
 
-export const _delete = async (req: Request, res: Response) => {
+export const _delete = async (req: RequestWithAuth, res: Response) => {
 	try {
-		await Blog.findByIdAndDelete(req.params.id)
+		await Blog.findOneAndDelete({
+			_id: req.params.id,
+			author: req.user._id,
+		})
 
 		return res.json({ message: 'Delete blog successfully' })
 	} catch (error: any) {
@@ -421,12 +446,12 @@ export const _delete = async (req: Request, res: Response) => {
 	}
 }
 
-export const like = async (req: Request, res: Response) => {
+export const like = async (req: RequestWithAuth, res: Response) => {
 	try {
 		const blog = await Blog.findByIdAndUpdate(
 			req.params.id,
 			{
-				$push: { likes: '63931241f799eb95abd4b604' },
+				$addToSet: { likes: req.user._id },
 			},
 			{ new: true }
 		)
@@ -441,12 +466,12 @@ export const like = async (req: Request, res: Response) => {
 	}
 }
 
-export const unlike = async (req: Request, res: Response) => {
+export const unlike = async (req: RequestWithAuth, res: Response) => {
 	try {
 		const blog = await Blog.findByIdAndUpdate(
 			req.params.id,
 			{
-				$pull: { likes: '63931241f799eb95abd4b604' },
+				$pull: { likes: req.user._id },
 			},
 			{ new: true }
 		)
@@ -457,6 +482,78 @@ export const unlike = async (req: Request, res: Response) => {
 			message: error.message,
 			error,
 			errorCode: 'blk5001',
+		})
+	}
+}
+
+export const pin = async (req: Request, res: Response) => {
+	try {
+		const blog = await Blog.findByIdAndUpdate(
+			req.params.id,
+			{
+				isPinned: true,
+			},
+			{ new: true }
+		)
+
+		return res.json({ message: 'Pin blog successfully', data: blog })
+	} catch (error: any) {
+		return res.status(500).json({
+			message: error.message,
+			error,
+			errorCode: 'bpi5001',
+		})
+	}
+}
+
+export const unpin = async (req: Request, res: Response) => {
+	try {
+		const blog = await Blog.findByIdAndUpdate(
+			req.params.id,
+			{
+				isPinned: false,
+			},
+			{ new: true }
+		)
+
+		return res.json({ message: 'Unpin blog successfully', data: blog })
+	} catch (error: any) {
+		return res.status(500).json({
+			message: error.message,
+			error,
+			errorCode: 'bup5001',
+		})
+	}
+}
+
+export const save = async (req: RequestWithAuth, res: Response) => {
+	try {
+		await User.findByIdAndUpdate(req.user._id, {
+			$addToSet: { savedBlogs: req.params.id },
+		})
+
+		return res.json({ message: 'Save blog successfully' })
+	} catch (error: any) {
+		return res.status(500).json({
+			message: error.message,
+			error,
+			errorCode: 'bsv5001',
+		})
+	}
+}
+
+export const unsave = async (req: RequestWithAuth, res: Response) => {
+	try {
+		await User.findByIdAndUpdate(req.user._id, {
+			$pull: { savedBlogs: req.params.id },
+		})
+
+		return res.json({ message: 'Unsave blog successfully' })
+	} catch (error: any) {
+		return res.status(500).json({
+			message: error.message,
+			error,
+			errorCode: 'bus5001',
 		})
 	}
 }
