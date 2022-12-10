@@ -91,6 +91,22 @@ const userSchema = new mongoose.Schema(
 			trim: true,
 			default: '',
 		},
+		isVerified: {
+			type: Boolean,
+			default: false,
+		},
+		followers: [
+			{
+				type: mongoose.Types.ObjectId,
+				ref: 'User',
+			},
+		],
+		followings: [
+			{
+				type: mongoose.Types.ObjectId,
+				ref: 'User',
+			},
+		],
 	},
 	{ timestamps: true }
 )
