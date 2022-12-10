@@ -31,6 +31,6 @@
   "scripts": {
     "start": "node build/index.js",
     "dev": "ts-node-dev src/index.ts",
-    "build": "yarn tsc"
+    "build": "npx tsc"
   }
 }
