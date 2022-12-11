@@ -1,7 +1,7 @@
 import express from 'express'
-import { categoriesController } from '../controllers'
-import admin from '../middleware/admin'
-import auth from '../middleware/auth'
+import { categoriesController } from '~/controllers'
+import admin from '~/middleware/admin'
+import auth from '~/middleware/auth'
 
 const categoriesRouter = express.Router()
 

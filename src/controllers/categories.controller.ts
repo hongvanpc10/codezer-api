@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import Category from '../models/category.model'
+import Category from '~/models/category.model'
 
 export const create = async (req: Request, res: Response) => {
 	try {

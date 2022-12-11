@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
-import User from '../models/user.model'
-import { verifyAccessToken } from '../utils/token'
+import User from '~/models/user.model'
+import { verifyAccessToken } from '~/utils/token'
 
 interface Decoded {
 	id: string

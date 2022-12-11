@@ -1,15 +1,15 @@
 import bcrypt from 'bcrypt'
 import { Request, Response } from 'express'
 import { JwtPayload } from 'jsonwebtoken'
-import User from '../models/user.model'
-import sendEmail from '../utils/sendEmail'
+import User from '~/models/user.model'
+import sendEmail from '~/utils/sendEmail'
 import {
 	generateAccessToken,
 	generateActiveToken,
 	generateRefreshToken,
 	verifyActiveToken,
 	verifyRefreshToken
-} from '../utils/token'
+} from '~/utils/token'
 
 export const register = async (req: Request, res: Response) => {
 	try {

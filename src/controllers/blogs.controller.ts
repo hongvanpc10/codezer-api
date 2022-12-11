@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import mongoose from 'mongoose'
-import { RequestWithAuth } from '../middleware/auth'
-import Blog from '../models/blog.model'
-import User from '../models/user.model'
+import { RequestWithAuth } from '~/middleware/auth'
+import Blog from '~/models/blog.model'
+import User from '~/models/user.model'
 
 export const create = async (req: RequestWithAuth, res: Response) => {
 	try {

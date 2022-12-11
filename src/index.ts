@@ -1,10 +1,11 @@
+import 'module-alias/register'
 import cookieParser from 'cookie-parser'
 import cors, { CorsOptions } from 'cors'
 import 'dotenv/config'
 import express from 'express'
 import morgan from 'morgan'
-import connectToDatabase from './config/db'
-import route from './routes'
+import connectToDatabase from '~/config/db'
+import route from '~/routes'
 
 const app = express()
 const PORT = process.env.PORT || 5000

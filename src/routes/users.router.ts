@@ -1,7 +1,7 @@
 import express from 'express'
-import { usersController } from '../controllers'
-import admin from '../middleware/admin'
-import auth from '../middleware/auth'
+import { usersController } from '~/controllers'
+import admin from '~/middleware/admin'
+import auth from '~/middleware/auth'
 
 const usersRouter = express.Router()
 

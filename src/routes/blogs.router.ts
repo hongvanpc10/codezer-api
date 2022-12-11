@@ -1,7 +1,7 @@
 import express from 'express'
-import { blogsController } from '../controllers'
-import admin from '../middleware/admin'
-import auth from '../middleware/auth'
+import { blogsController } from '~/controllers'
+import admin from '~/middleware/admin'
+import auth from '~/middleware/auth'
 
 const blogsRouter = express.Router()
 
