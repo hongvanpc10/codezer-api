@@ -96,7 +96,7 @@ export const login = async (req: Request, res: Response) => {
 		const user = await User.findOne({
 			email,
 			type: 'register',
-		})
+		}).select('-savedBlogs')
 
 		if (!user)
 			return res.status(400).json({
@@ -122,9 +122,12 @@ export const login = async (req: Request, res: Response) => {
 			path: '/api/auth/refresh-token',
 		})
 
+		user.password = ''
+
 		return res.json({
 			message: 'Logged in successfully',
 			accessToken,
+			data: user,
 		})
 	} catch (error: any) {
 		return res.status(500).json({
@@ -168,7 +171,9 @@ export const refreshToken = async (req: Request, res: Response) => {
 
 		const decoded = <Decoded>verifyRefreshToken(refreshToken)
 
-		const user = await User.findById(decoded.id).select('-password')
+		const user = await User.findById(decoded.id).select(
+			'-password -savedBlogs'
+		)
 
 		if (!user) return res.status(401).json({ message: 'User not found' })
 

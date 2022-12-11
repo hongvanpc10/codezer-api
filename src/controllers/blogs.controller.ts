@@ -17,6 +17,7 @@ export const create = async (req: RequestWithAuth, res: Response) => {
 			author: req.user._id,
 		})
 
+		await User.findByIdAndUpdate(req.user._id, { $inc: { scores: 10 } })
 		await blog.save()
 
 		return res.json({ message: 'Create blog successfully' })
@@ -42,6 +43,7 @@ export const getBlogsGroupByCategory = async (req: Request, res: Response) => {
 						{
 							$project: {
 								password: 0,
+								savedBlogs: 0,
 							},
 						},
 					],
@@ -111,7 +113,7 @@ export const getBlog = async (req: Request, res: Response) => {
 	try {
 		const blog = await Blog.findById(req.params.id).populate(
 			'author categories likes',
-			'-password'
+			'-password -savedBlogs'
 		)
 
 		return res.json({ message: 'Get blog successfully', data: blog })
@@ -128,10 +130,10 @@ export const getBlogs = async (req: Request, res: Response) => {
 	try {
 		const limit = Number(req.query.limit) || 6
 		const sort = req.query.sort || 'createdAt'
-		const order = Number(req.query.order) || 'dsd'
+		const order = Number(req.query.order) || -1
 		const page = Number(req.query.page) || 1
 
-		const blogs = await Blog.aggregate([
+		const data = await Blog.aggregate([
 			{
 				$facet: {
 					blogs: [
@@ -145,6 +147,7 @@ export const getBlogs = async (req: Request, res: Response) => {
 									{
 										$project: {
 											password: 0,
+											savedBlogs: 0,
 										},
 									},
 								],
@@ -166,7 +169,7 @@ export const getBlogs = async (req: Request, res: Response) => {
 
 						{
 							$sort: {
-								[sort as string]: order === 'dsd' ? -1 : 1,
+								[sort as string]: <1 | -1>order,
 							},
 						},
 
@@ -190,7 +193,20 @@ export const getBlogs = async (req: Request, res: Response) => {
 				},
 			},
 		])
-		return res.json({ message: 'Get blogs successfully', data: blogs[0] })
+
+		const totalPages = Math.ceil(data[0].total / limit)
+
+		return res.json({
+			message: 'Get blogs successfully',
+			data: {
+				...data[0],
+				pagination: {
+					totalPages,
+					currentPage: page,
+					itemsPerPage: limit,
+				},
+			},
+		})
 	} catch (error: any) {
 		return res.status(500).json({
 			message: error.message,
@@ -207,7 +223,7 @@ export const getBlogsByCategory = async (req: Request, res: Response) => {
 		const order = Number(req.query.order) || 'dsd'
 		const page = Number(req.query.page) || 1
 
-		const blogs = await Blog.aggregate([
+		const data = await Blog.aggregate([
 			{
 				$facet: {
 					blogs: [
@@ -229,6 +245,7 @@ export const getBlogsByCategory = async (req: Request, res: Response) => {
 									{
 										$project: {
 											password: 0,
+											savedBlogs: 0,
 										},
 									},
 								],
@@ -285,7 +302,19 @@ export const getBlogsByCategory = async (req: Request, res: Response) => {
 			},
 		])
 
-		return res.json({ message: 'Get blogs successfully', data: blogs[0] })
+		const totalPages = Math.ceil(data[0].total / limit)
+
+		return res.json({
+			message: 'Get blogs successfully',
+			data: {
+				...data[0],
+				pagination: {
+					totalPages,
+					currentPage: page,
+					itemsPerPage: limit,
+				},
+			},
+		})
 	} catch (error: any) {
 		return res.status(500).json({
 			message: error.message,
@@ -302,7 +331,7 @@ export const getBlogsByUser = async (req: Request, res: Response) => {
 		const order = Number(req.query.order) || 'dsd'
 		const page = Number(req.query.page) || 1
 
-		const blogs = await Blog.aggregate([
+		const data = await Blog.aggregate([
 			{
 				$facet: {
 					blogs: [
@@ -324,6 +353,7 @@ export const getBlogsByUser = async (req: Request, res: Response) => {
 									{
 										$project: {
 											password: 0,
+											savedBlogs: 0,
 										},
 									},
 								],
@@ -379,7 +409,125 @@ export const getBlogsByUser = async (req: Request, res: Response) => {
 			},
 		])
 
-		return res.json({ message: 'Get blogs successfully', data: blogs[0] })
+		const totalPages = Math.ceil(data[0].total / limit)
+
+		return res.json({
+			message: 'Get blogs successfully',
+			data: {
+				...data[0],
+				pagination: {
+					totalPages,
+					currentPage: page,
+					itemsPerPage: limit,
+				},
+			},
+		})
+	} catch (error: any) {
+		return res.status(500).json({
+			message: error.message,
+			error,
+			errorCode: 'bbu5001',
+		})
+	}
+}
+
+export const getFollowingsBlogs = async (
+	req: RequestWithAuth,
+	res: Response
+) => {
+	try {
+		const limit = Number(req.query.limit) || 6
+		const sort = req.query.sort || 'createdAt'
+		const order = Number(req.query.order) || 'dsd'
+		const page = Number(req.query.page) || 1
+
+		const data = await Blog.aggregate([
+			{
+				$facet: {
+					blogs: [
+						{
+							$match: {
+								author: { $in: req.user.followings },
+							},
+						},
+
+						{
+							$lookup: {
+								from: 'users',
+								localField: 'author',
+								foreignField: '_id',
+								as: 'author',
+								pipeline: [
+									{
+										$project: {
+											password: 0,
+											savedBlogs: 0,
+										},
+									},
+								],
+							},
+						},
+
+						{
+							$unwind: '$author',
+						},
+
+						{
+							$lookup: {
+								from: 'categories',
+								localField: 'categories',
+								foreignField: '_id',
+								as: 'categories',
+							},
+						},
+
+						{
+							$sort: {
+								[sort as string]: order === 'dsd' ? -1 : 1,
+							},
+						},
+						{
+							$skip: (page - 1) * limit,
+						},
+
+						{
+							$limit: limit,
+						},
+					],
+
+					total: [
+						{
+							$match: {
+								author: { $in: req.user.followings },
+							},
+						},
+
+						{ $count: 'count' },
+					],
+				},
+			},
+
+			{
+				$project: {
+					blogs: 1,
+					total: { $arrayElemAt: ['$total.count', 0] },
+				},
+			},
+		])
+
+		const totalPages = Math.ceil(data[0].total / limit)
+
+		return res.json({
+			message: 'Get blogs successfully',
+			data: {
+				...data[0],
+				pagination: {
+					totalPages,
+					currentPage: page,
+					itemsPerPage: limit,
+				},
+			},
+		})
 	} catch (error: any) {
 		return res.status(500).json({
 			message: error.message,
@@ -392,7 +540,7 @@ export const getBlogsByUser = async (req: Request, res: Response) => {
 export const getPinnedBlogs = async (req: Request, res: Response) => {
 	try {
 		const blogs = await Blog.find({ isPinned: true })
-			.populate('author categories', '-password')
+			.populate('author categories', '-password -savedBlogs')
 			.sort('-createdAt')
 			.limit(6)
 
@@ -417,7 +565,7 @@ export const update = async (req: RequestWithAuth, res: Response) => {
 			req.params.id,
 			{ title, description, content, thumb, categories },
 			{ new: true }
-		)
+		).populate('author categories', '-password -savedBlogs')
 
 		return res.json({ message: 'Update blog successfully', data: blog })
 	} catch (error: any) {
@@ -435,6 +583,8 @@ export const _delete = async (req: RequestWithAuth, res: Response) => {
 			_id: req.params.id,
 			author: req.user._id,
 		})
+
+		await User.findByIdAndUpdate(req.user._id, { $inc: { scores: -8 } })
 
 		return res.json({ message: 'Delete blog successfully' })
 	} catch (error: any) {
@@ -454,7 +604,7 @@ export const like = async (req: RequestWithAuth, res: Response) => {
 				$addToSet: { likes: req.user._id },
 			},
 			{ new: true }
-		)
+		).populate('author categories', '-password -savedBlogs')
 
 		return res.json({ message: 'Like blog successfully', data: blog })
 	} catch (error: any) {
@@ -474,7 +624,7 @@ export const unlike = async (req: RequestWithAuth, res: Response) => {
 				$pull: { likes: req.user._id },
 			},
 			{ new: true }
-		)
+		).populate('author categories', '-password -savedBlogs')
 
 		return res.json({ message: 'Unlike blog successfully', data: blog })
 	} catch (error: any) {
@@ -488,15 +638,11 @@ export const unlike = async (req: RequestWithAuth, res: Response) => {
 
 export const pin = async (req: Request, res: Response) => {
 	try {
-		const blog = await Blog.findByIdAndUpdate(
-			req.params.id,
-			{
-				isPinned: true,
-			},
-			{ new: true }
-		)
+		await Blog.findByIdAndUpdate(req.params.id, {
+			isPinned: true,
+		})
 
-		return res.json({ message: 'Pin blog successfully', data: blog })
+		return res.json({ message: 'Pin blog successfully' })
 	} catch (error: any) {
 		return res.status(500).json({
 			message: error.message,
@@ -508,15 +654,11 @@ export const pin = async (req: Request, res: Response) => {
 
 export const unpin = async (req: Request, res: Response) => {
 	try {
-		const blog = await Blog.findByIdAndUpdate(
-			req.params.id,
-			{
-				isPinned: false,
-			},
-			{ new: true }
-		)
+		await Blog.findByIdAndUpdate(req.params.id, {
+			isPinned: false,
+		})
 
-		return res.json({ message: 'Unpin blog successfully', data: blog })
+		return res.json({ message: 'Unpin blog successfully' })
 	} catch (error: any) {
 		return res.status(500).json({
 			message: error.message,
@@ -549,6 +691,215 @@ export const unsave = async (req: RequestWithAuth, res: Response) => {
 		})
 
 		return res.json({ message: 'Unsave blog successfully' })
+	} catch (error: any) {
+		return res.status(500).json({
+			message: error.message,
+			error,
+			errorCode: 'bus5001',
+		})
+	}
+}
+
+export const getSavedBlogs = async (req: RequestWithAuth, res: Response) => {
+	try {
+		const limit = Number(req.query.limit) || 6
+		const sort = req.query.sort || 'createdAt'
+		const order = Number(req.query.order) || 'dsd'
+		const page = Number(req.query.page) || 1
+
+		const data = await Blog.aggregate([
+			{
+				$facet: {
+					blogs: [
+						{
+							$match: {
+								_id: {
+									$in: req.user.savedBlogs,
+								},
+							},
+						},
+
+						{
+							$lookup: {
+								from: 'users',
+								localField: 'author',
+								foreignField: '_id',
+								as: 'author',
+								pipeline: [
+									{
+										$project: {
+											password: 0,
+										},
+									},
+								],
+							},
+						},
+
+						{
+							$unwind: '$author',
+						},
+
+						{
+							$lookup: {
+								from: 'categories',
+								localField: 'categories',
+								foreignField: '_id',
+								as: 'categories',
+							},
+						},
+
+						{
+							$sort: {
+								[sort as string]: order === 'dsd' ? -1 : 1,
+							},
+						},
+						{
+							$skip: (page - 1) * limit,
+						},
+
+						{
+							$limit: limit,
+						},
+					],
+
+					total: [
+						{
+							$match: {
+								author: new mongoose.Types.ObjectId(
+									req.params.id
+								),
+							},
+						},
+
+						{ $count: 'count' },
+					],
+				},
+			},
+
+			{
+				$project: {
+					blogs: 1,
+					total: { $arrayElemAt: ['$total.count', 0] },
+				},
+			},
+		])
+
+		const totalPages = Math.ceil(data[0].total / limit)
+
+		return res.json({
+			message: 'Get blogs successfully',
+			data: {
+				...data[0],
+				pagination: {
+					totalPages,
+					currentPage: page,
+					itemsPerPage: limit,
+				},
+			},
+		})
+	} catch (error: any) {
+		return res.status(500).json({
+			message: error.message,
+			error,
+			errorCode: 'bus5001',
+		})
+	}
+}
+
+export const getLikedBlogs = async (req: RequestWithAuth, res: Response) => {
+	try {
+		const limit = Number(req.query.limit) || 6
+		const sort = req.query.sort || 'createdAt'
+		const order = Number(req.query.order) || 'dsd'
+		const page = Number(req.query.page) || 1
+
+		const data = await Blog.aggregate([
+			{
+				$facet: {
+					blogs: [
+						{
+							$match: {
+								likes: req.user._id,
+							},
+						},
+
+						{
+							$lookup: {
+								from: 'users',
+								localField: 'author',
+								foreignField: '_id',
+								as: 'author',
+								pipeline: [
+									{
+										$project: {
+											password: 0,
+											savedBlogs: 0,
+										},
+									},
+								],
+							},
+						},
+
+						{
+							$unwind: '$author',
+						},
+
+						{
+							$lookup: {
+								from: 'categories',
+								localField: 'categories',
+								foreignField: '_id',
+								as: 'categories',
+							},
+						},
+
+						{
+							$sort: {
+								[sort as string]: order === 'dsd' ? -1 : 1,
+							},
+						},
+						{
+							$skip: (page - 1) * limit,
+						},
+
+						{
+							$limit: limit,
+						},
+					],
+
+					total: [
+						{
+							$match: {
+								likes: req.user._id,
+							},
+						},
+
+						{ $count: 'count' },
+					],
+				},
+			},
+
+			{
+				$project: {
+					blogs: 1,
+					total: { $arrayElemAt: ['$total.count', 0] },
+				},
+			},
+		])
+
+		const totalPages = Math.ceil(data[0].total / limit)
+
+		return res.json({
+			message: 'Get blogs successfully',
+			data: {
+				...data[0],
+				pagination: {
+					totalPages,
+					currentPage: page,
+					itemsPerPage: limit,
+				},
+			},
+		})
 	} catch (error: any) {
 		return res.status(500).json({
 			message: error.message,
