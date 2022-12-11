@@ -1,5 +1,5 @@
 import express from 'express'
-import { blogsController } from '~/controllers'
+import * as blogsController from '~/controllers/blogs'
 import admin from '~/middleware/admin'
 import auth from '~/middleware/auth'
 
@@ -25,6 +25,6 @@ blogsRouter.get('/:id', blogsController.getBlog)
 
 blogsRouter.patch('/:id', auth, blogsController.update)
 
-blogsRouter.delete('/:id', auth, blogsController._delete)
+blogsRouter.delete('/:id', auth, blogsController.delete)
 
 export default blogsRouter

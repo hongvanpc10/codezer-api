@@ -1,5 +1,5 @@
 import express from 'express'
-import { usersController } from '~/controllers'
+import * as usersController from '~/controllers/users'
 import admin from '~/middleware/admin'
 import auth from '~/middleware/auth'
 
@@ -10,7 +10,7 @@ usersRouter.patch('/change-password', auth, usersController.changePassword)
 
 usersRouter.get('/:id/topfan', [auth, admin], usersController.setTopFan)
 usersRouter.get('/:id/verify', [auth, admin], usersController.verify)
-usersRouter.get('/top', usersController.getTopUser)
+usersRouter.get('/top', usersController.getTopUsers)
 usersRouter.get('/:id/follow', auth, usersController.follow)
 usersRouter.get('/:id/unfollow', auth, usersController.unfollow)
 usersRouter.get('/:id', usersController.get)
