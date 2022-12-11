@@ -1,6 +1,4 @@
 import { NextFunction, Response } from 'express'
-import User from '../models/user.model'
-import { verifyAccessToken } from '../utils/token'
 import { RequestWithAuth } from './auth'
 
 export default async function admin(

@@ -1,7 +1,7 @@
+import bcrypt from 'bcrypt'
 import { Request, Response } from 'express'
 import { RequestWithAuth } from '../middleware/auth'
 import User from '../models/user.model'
-import bcrypt from 'bcrypt'
 
 export const update = async (req: RequestWithAuth, res: Response) => {
 	try {

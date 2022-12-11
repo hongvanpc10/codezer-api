@@ -8,7 +8,7 @@ import {
 	generateActiveToken,
 	generateRefreshToken,
 	verifyActiveToken,
-	verifyRefreshToken,
+	verifyRefreshToken
 } from '../utils/token'
 
 export const register = async (req: Request, res: Response) => {
