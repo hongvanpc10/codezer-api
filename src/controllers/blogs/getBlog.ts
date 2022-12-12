@@ -3,10 +3,15 @@ import Blog from '~/models/blog.model'
 
 export default async function getBlog(req: Request, res: Response) {
 	try {
-		const blog = await Blog.findById(req.params.id).populate(
-			'author categories likes',
+		const blog = await Blog.findOne({ slug: req.params.slug }).populate(
+			'author categories',
 			'-password -savedBlogs'
 		)
+
+		if (!blog)
+			return res
+				.status(404)
+				.json({ message: 'Blog not found', errorCode: 'bgo4001' })
 
 		return res.json({ message: 'Get blog successfully', data: blog })
 	} catch (error: any) {

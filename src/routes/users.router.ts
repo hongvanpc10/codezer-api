@@ -13,6 +13,6 @@ usersRouter.get('/:id/verify', [auth, admin], usersController.verify)
 usersRouter.get('/top', usersController.getTopUsers)
 usersRouter.get('/:id/follow', auth, usersController.follow)
 usersRouter.get('/:id/unfollow', auth, usersController.unfollow)
-usersRouter.get('/:id', usersController.get)
+usersRouter.get('/:slug', usersController.get)
 
 export default usersRouter

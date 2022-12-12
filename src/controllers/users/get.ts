@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 import User from '~/models/user.model'
 
-export default async function get  (req: Request, res: Response)  {
+export default async function get(req: Request, res: Response) {
 	try {
-		const user = await User.findById(req.params.id).select(
+		const user = await User.findOne({ slug: req.params.slug }).select(
 			'-password -savedBlogs'
 		)
 

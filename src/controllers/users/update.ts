@@ -23,7 +23,10 @@ export default async function update(req: RequestWithAuth, res: Response) {
 				lastName,
 				bio,
 				introduction,
-				socials: { facebook, twitter, likedIn, website },
+				facebook,
+				twitter,
+				likedIn,
+				website,
 				avatar,
 			},
 			{ new: true }

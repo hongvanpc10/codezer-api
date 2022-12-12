@@ -5,7 +5,7 @@ export default async function getTopUsers(req: Request, res: Response) {
 	try {
 		const users = await User.find({ role: 'user' })
 			.select('-password -savedBlogs')
-			.sort('scores')
+			.sort('-scores')
 			.limit(5)
 
 		return res.json({

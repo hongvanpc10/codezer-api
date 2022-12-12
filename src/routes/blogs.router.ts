@@ -21,7 +21,7 @@ blogsRouter.get('/:id/unpin', [auth, admin], blogsController.unpin)
 blogsRouter.get('/:id/unlike', auth, blogsController.unlike)
 blogsRouter.get('/:id/save', auth, blogsController.save)
 blogsRouter.get('/:id/unsave', auth, blogsController.unsave)
-blogsRouter.get('/:id', blogsController.getBlog)
+blogsRouter.get('/:slug', blogsController.getBlog)
 
 blogsRouter.patch('/:id', auth, blogsController.update)
 

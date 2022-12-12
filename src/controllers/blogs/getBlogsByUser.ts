@@ -1,13 +1,11 @@
 import { Request, Response } from 'express'
 import mongoose from 'mongoose'
 import Blog from '~/models/blog.model'
+import paginate from '~/utils/paginate'
 
 export default async function getBlogsByUser(req: Request, res: Response) {
 	try {
-		const limit = Number(req.query.limit) || 6
-		const sort = req.query.sort || 'createdAt'
-		const order = Number(req.query.order) || 'dsd'
-		const page = Number(req.query.page) || 1
+		const { limit, page, skip, sort } = paginate(req)
 
 		const data = await Blog.aggregate([
 			{
@@ -52,12 +50,10 @@ export default async function getBlogsByUser(req: Request, res: Response) {
 						},
 
 						{
-							$sort: {
-								[sort as string]: order === 'dsd' ? -1 : 1,
-							},
+							$sort: sort,
 						},
 						{
-							$skip: (page - 1) * limit,
+							$skip: skip,
 						},
 
 						{

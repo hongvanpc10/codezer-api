@@ -1,12 +1,10 @@
 import { Request, Response } from 'express'
 import Blog from '~/models/blog.model'
+import paginate from '~/utils/paginate'
 
 export default async function getBlogs(req: Request, res: Response) {
 	try {
-		const limit = Number(req.query.limit) || 6
-		const sort = req.query.sort || 'createdAt'
-		const order = Number(req.query.order) || -1
-		const page = Number(req.query.page) || 1
+		const { limit, page, sort, skip } = paginate(req)
 
 		const data = await Blog.aggregate([
 			{
@@ -43,13 +41,11 @@ export default async function getBlogs(req: Request, res: Response) {
 						},
 
 						{
-							$sort: {
-								[sort as string]: <1 | -1>order,
-							},
+							$sort: sort,
 						},
 
 						{
-							$skip: (page - 1) * limit,
+							$skip: skip,
 						},
 
 						{

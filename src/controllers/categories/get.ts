@@ -3,7 +3,7 @@ import Category from '~/models/category.model'
 
 export default async function get(req: Request, res: Response) {
 	try {
-		const category = await Category.find()
+		const category = await Category.find().sort('name')
 
 		res.json({ message: 'Get category successfully', data: category })
 	} catch (error: any) {

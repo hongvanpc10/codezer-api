@@ -49,27 +49,26 @@ const userSchema = new mongoose.Schema(
 			default: 'register',
 			enum: ['register', 'google', 'facebook', 'github'],
 		},
-		socials: {
-			facebook: {
-				type: String,
-				trim: true,
-				default: '',
-			},
-			twitter: {
-				type: String,
-				trim: true,
-				default: '',
-			},
-			likedIn: {
-				type: String,
-				trim: true,
-				default: '',
-			},
-			website: {
-				type: String,
-				trim: true,
-				default: '',
-			},
+
+		facebook: {
+			type: String,
+			trim: true,
+			default: '',
+		},
+		twitter: {
+			type: String,
+			trim: true,
+			default: '',
+		},
+		likedIn: {
+			type: String,
+			trim: true,
+			default: '',
+		},
+		website: {
+			type: String,
+			trim: true,
+			default: '',
 		},
 		savedBlogs: [
 			{
