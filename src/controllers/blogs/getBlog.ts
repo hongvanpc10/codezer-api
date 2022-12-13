@@ -3,9 +3,12 @@ import Blog from '~/models/blog.model'
 
 export default async function getBlog(req: Request, res: Response) {
 	try {
-		const blog = await Blog.findOne({ slug: req.params.slug }).populate(
+		const blog = await Blog.findOneAndUpdate(
+			{ slug: req.params.slug },
+			{ $inc: { views: 1 } }
+		).populate(
 			'author categories',
-			'-password -savedBlogs'
+			'firstName lastName slug avatar isTopFan isVerified role name'
 		)
 
 		if (!blog)

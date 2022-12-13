@@ -4,13 +4,10 @@ import Blog from '~/models/blog.model'
 
 export default async function update(req: RequestWithAuth, res: Response) {
 	try {
-		if (req.user._id !== req.params.id)
-			return res.status(400).json({ message: 'Not author' })
-
 		const { title, thumb, description, content, categories } = req.body
 
-		const blog = await Blog.findByIdAndUpdate(
-			req.params.id,
+		const blog = await Blog.findOneAndUpdate(
+			{ _id: req.params.id, author: req.user._id },
 			{ title, description, content, thumb, categories },
 			{ new: true }
 		).populate('author categories', '-password -savedBlogs')

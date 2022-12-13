@@ -8,6 +8,22 @@ export default async function getBlogsGroupByCategory(
 	try {
 		const data = await Blog.aggregate([
 			{
+				$project: {
+					title: 1,
+					views: 1,
+					thumb: 1,
+					slug: 1,
+					createdAt: 1,
+					author: 1,
+					description: 1,
+					categories: 1,
+					likesCount: {
+						$size: '$likes',
+					},
+				},
+			},
+
+			{
 				$lookup: {
 					from: 'users',
 					localField: 'author',
@@ -16,8 +32,13 @@ export default async function getBlogsGroupByCategory(
 					pipeline: [
 						{
 							$project: {
-								password: 0,
-								savedBlogs: 0,
+								firstName: 1,
+								lastName: 1,
+								slug: 1,
+								avatar: 1,
+								isTopFan: 1,
+								isVerified: 1,
+								role: 1,
 							},
 						},
 					],

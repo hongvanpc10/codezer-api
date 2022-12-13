@@ -20,24 +20,19 @@ export default async function getBlogsByUser(req: Request, res: Response) {
 						},
 
 						{
-							$lookup: {
-								from: 'users',
-								localField: 'author',
-								foreignField: '_id',
-								as: 'author',
-								pipeline: [
-									{
-										$project: {
-											password: 0,
-											savedBlogs: 0,
-										},
-									},
-								],
+							$project: {
+								title: 1,
+								views: 1,
+								thumb: 1,
+								slug: 1,
+								createdAt: 1,
+								description: 1,
+								author: 1,
+								categories: 1,
+								likesCount: {
+									$size: '$likes',
+								},
 							},
-						},
-
-						{
-							$unwind: '$author',
 						},
 
 						{

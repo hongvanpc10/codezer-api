@@ -30,7 +30,7 @@ export default async function update(req: RequestWithAuth, res: Response) {
 				avatar,
 			},
 			{ new: true }
-		)
+		).select('-password')
 
 		return res.json({ message: 'Update user successfully', data: user })
 	} catch (error: any) {

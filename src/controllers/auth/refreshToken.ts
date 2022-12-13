@@ -18,7 +18,7 @@ export default async function refreshToken(req: Request, res: Response) {
 		const decoded = <Decoded>verifyRefreshToken(refreshToken)
 
 		const user = await User.findById(decoded.id).select(
-			'-password -savedBlogs'
+			'-password -savedBlogs -email'
 		)
 
 		if (!user) return res.status(401).json({ message: 'User not found' })

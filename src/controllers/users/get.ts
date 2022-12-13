@@ -4,7 +4,7 @@ import User from '~/models/user.model'
 export default async function get(req: Request, res: Response) {
 	try {
 		const user = await User.findOne({ slug: req.params.slug }).select(
-			'-password -savedBlogs'
+			'-password -savedBlogs -email'
 		)
 
 		if (!user)

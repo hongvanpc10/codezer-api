@@ -4,7 +4,11 @@ import Blog from '~/models/blog.model'
 export default async function getPinnedBlogs(req: Request, res: Response) {
 	try {
 		const blogs = await Blog.find({ isPinned: true })
-			.populate('author categories', '-password -savedBlogs')
+			.populate(
+				'author categories',
+				'firstName lastName avatar slug description isTopFan isVerified role name'
+			)
+			.select('-content')
 			.sort('-createdAt')
 			.limit(6)
 

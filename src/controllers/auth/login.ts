@@ -10,7 +10,7 @@ export default async function login(req: Request, res: Response) {
 		const user = await User.findOne({
 			email,
 			type: 'register',
-		}).select('-savedBlogs')
+		}).select('-savedBlogs -email')
 
 		if (!user)
 			return res.status(400).json({
