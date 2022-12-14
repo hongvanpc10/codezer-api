@@ -25,7 +25,7 @@ export default async function sendEmail({
 }: Options) {
 	try {
 		const accessTokenObject = await oAuth2Client.getAccessToken()
-		const accessToken = accessTokenObject.token as string
+		const accessToken = <string>accessTokenObject.token
 
 		const transport = nodemailer.createTransport({
 			service: 'gmail',

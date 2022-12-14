@@ -13,4 +13,3 @@ export * from './like'
 export * from './pin'
 export * from './save'
 export { default as update } from './update'
-
