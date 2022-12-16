@@ -1,9 +1,17 @@
 import bcrypt from 'bcrypt'
-import { Request, Response } from 'express'
+import { CookieOptions, Request, Response } from 'express'
 import User from '~/models/user.model'
 import { generateAccessToken, generateRefreshToken } from '~/utils/token'
 
-export default async function login(req: Request, res: Response) {
+const cookieOptions: CookieOptions = {
+	maxAge: 30 * 24 * 60 * 60 * 1000,
+	httpOnly: true,
+	secure: process.env.NODE_ENV === 'production',
+	path: '/api/auth/refresh-token',
+	sameSite: process.env.NODE_ENV === 'production' && 'none',
+}
+
+export async function login(req: Request, res: Response) {
 	try {
 		const { email, password } = req.body
 
@@ -29,12 +37,7 @@ export default async function login(req: Request, res: Response) {
 		const refreshToken = generateRefreshToken({ id: user._id })
 		const accessToken = generateAccessToken({ id: user._id })
 
-		res.cookie('refreshToken', refreshToken, {
-			maxAge: 30 * 24 * 60 * 60 * 1000,
-			httpOnly: true,
-			secure: process.env.NODE_ENV === 'production',
-			path: '/api/auth/refresh-token',
-		})
+		res.cookie('refreshToken', refreshToken, cookieOptions)
 
 		user.password = ''
 
