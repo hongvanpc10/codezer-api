@@ -28,6 +28,7 @@ const userSchema = new mongoose.Schema(
 		slug: {
 			type: String,
 			slug: ['lastName', 'firstName'],
+			unique: true,
 		},
 		bio: {
 			type: String,

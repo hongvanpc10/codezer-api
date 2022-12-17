@@ -14,6 +14,7 @@ const categorySchema = new mongoose.Schema(
 		slug: {
 			type: String,
 			slug: 'name',
+			unique: true,
 		},
 		description: {
 			type: String,
