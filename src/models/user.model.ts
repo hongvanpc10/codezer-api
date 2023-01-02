@@ -5,12 +5,7 @@ mongoose.plugin(slug)
 
 const userSchema = new mongoose.Schema(
 	{
-		firstName: {
-			type: String,
-			required: true,
-			trim: true,
-		},
-		lastName: {
+		name: {
 			type: String,
 			required: true,
 			trim: true,
@@ -27,7 +22,7 @@ const userSchema = new mongoose.Schema(
 		},
 		slug: {
 			type: String,
-			slug: ['lastName', 'firstName'],
+			slug: 'name',
 			unique: true,
 		},
 		bio: {

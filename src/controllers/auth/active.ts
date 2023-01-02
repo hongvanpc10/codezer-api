@@ -7,9 +7,7 @@ export default async function active(req: Request, res: Response) {
 	try {
 		const token: string = req.body.token
 
-		const { firstName, lastName, email, password } = <JwtPayload>(
-			verifyActiveToken(token)
-		)
+		const { name, email, password } = <JwtPayload>verifyActiveToken(token)
 
 		const user = await User.findOne({ email, type: 'register' })
 
@@ -19,16 +17,10 @@ export default async function active(req: Request, res: Response) {
 				errorCode: 'aac4001',
 			})
 
-		const avatar = `https://ui-avatars.com/api/?name=${encodeURI(
-			lastName + ' ' + firstName
-		)}&bold=true&size=128&background=random&color=ffffff`
-
 		const newUser = new User({
-			firstName,
-			lastName,
+			name,
 			email,
 			password,
-			avatar,
 		})
 
 		await newUser.save()

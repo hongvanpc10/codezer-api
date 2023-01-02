@@ -5,8 +5,7 @@ import User from '~/models/user.model'
 export default async function update(req: RequestWithAuth, res: Response) {
 	try {
 		const {
-			firstName,
-			lastName,
+			name,
 			bio,
 			introduction,
 			facebook,
@@ -19,8 +18,7 @@ export default async function update(req: RequestWithAuth, res: Response) {
 		const user = await User.findByIdAndUpdate(
 			req.user._id,
 			{
-				firstName,
-				lastName,
+				name,
 				bio,
 				introduction,
 				facebook,
