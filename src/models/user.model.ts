@@ -77,10 +77,6 @@ const userSchema = new mongoose.Schema(
 				ref: 'Blog',
 			},
 		],
-		isTopFan: {
-			type: Boolean,
-			default: false,
-		},
 		scores: {
 			type: Number,
 			default: 0,

@@ -8,7 +8,6 @@ const usersRouter = express.Router()
 usersRouter.patch('/', auth, usersController.update)
 usersRouter.patch('/change-password', auth, usersController.changePassword)
 
-usersRouter.get('/:id/topfan', [auth, admin], usersController.setTopFan)
 usersRouter.get('/:id/verify', [auth, admin], usersController.verify)
 usersRouter.get('/top', usersController.getTopUsers)
 usersRouter.get('/:id/follow', auth, usersController.follow)
