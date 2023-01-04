@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema(
 		},
 		slug: {
 			type: String,
-			slug: 'name',
+			slug: 'fullName',
 			unique: true,
 		},
 		bio: {
