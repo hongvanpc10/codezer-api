@@ -4,7 +4,7 @@ import User from '~/models/user.model'
 export default async function getTopUsers(req: Request, res: Response) {
 	try {
 		const users = await User.find({ role: 'user' })
-			.select('firstName lastName scores avatar')
+			.select('fullName scores avatar slug')
 			.sort('-scores')
 			.limit(5)
 

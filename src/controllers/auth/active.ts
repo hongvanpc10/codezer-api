@@ -7,7 +7,9 @@ export default async function active(req: Request, res: Response) {
 	try {
 		const token: string = req.body.token
 
-		const { name, email, password } = <JwtPayload>verifyActiveToken(token)
+		const { fullName, email, password } = <JwtPayload>(
+			verifyActiveToken(token)
+		)
 
 		const user = await User.findOne({ email, type: 'register' })
 
@@ -18,7 +20,7 @@ export default async function active(req: Request, res: Response) {
 			})
 
 		const newUser = new User({
-			name,
+			fullName,
 			email,
 			password,
 		})

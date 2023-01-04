@@ -45,8 +45,7 @@ export default async function getFollowingsBlogs(
 								pipeline: [
 									{
 										$project: {
-											firstName: 1,
-											lastName: 1,
+											fullName: 1,
 											slug: 1,
 											avatar: 1,
 											isTopFan: 1,

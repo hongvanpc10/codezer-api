@@ -6,7 +6,7 @@ export default async function getPinnedBlogs(req: Request, res: Response) {
 		const blogs = await Blog.find({ isPinned: true })
 			.populate(
 				'author categories',
-				'firstName lastName avatar slug description isTopFan isVerified role name'
+				'fullName avatar slug description isTopFan isVerified role name'
 			)
 			.select('-content')
 			.sort('-createdAt')

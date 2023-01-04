@@ -8,7 +8,7 @@ export default async function getBlog(req: Request, res: Response) {
 			{ $inc: { views: 1 } }
 		).populate(
 			'author categories',
-			'firstName lastName slug avatar isTopFan isVerified role name'
+			'fullName slug avatar isTopFan isVerified role name'
 		)
 
 		if (!blog)

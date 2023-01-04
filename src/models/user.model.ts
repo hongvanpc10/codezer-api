@@ -5,7 +5,7 @@ mongoose.plugin(slug)
 
 const userSchema = new mongoose.Schema(
 	{
-		name: {
+		fullName: {
 			type: String,
 			required: true,
 			trim: true,
@@ -26,11 +26,6 @@ const userSchema = new mongoose.Schema(
 			unique: true,
 		},
 		bio: {
-			type: String,
-			trim: true,
-			default: '',
-		},
-		introduction: {
 			type: String,
 			trim: true,
 			default: '',

@@ -6,7 +6,7 @@ import { generateActiveToken } from '~/utils/token'
 
 export default async function register(req: Request, res: Response) {
 	try {
-		const { name, email, password } = req.body
+		const { fullName, email, password } = req.body
 
 		const user = await User.findOne({ email, type: 'register' })
 
@@ -18,7 +18,7 @@ export default async function register(req: Request, res: Response) {
 		const hashedPassword = await bcrypt.hash(password, 10)
 
 		const activeToken = generateActiveToken({
-			name,
+			fullName,
 			email,
 			password: hashedPassword,
 		})
@@ -29,7 +29,7 @@ export default async function register(req: Request, res: Response) {
 		sendEmail({
 			to: email,
 			subject: 'Xác thực tài khoản tại Codezer 🎉',
-			html: `<h3>Xin chào ${name}! 😍</h3><p>Cảm ơn bạn đã đăng kí tài khoản tại <a href="${clientUrl}">Codezer</a>.</p><p>Để tiếp tục, hãy truy cập liên kết dưới đây: 👇</p><p><a href="${activeUrl}">${activeUrl}</a></p><p>(Lưu ý: Liên kết chỉ có hiệu lực trong 5 phút. Nếu quá thời hạn, hãy đăng kí lại.)</p><h4>Thân ái!</h4>`,
+			html: `<h3>Xin chào ${fullName}! 😍</h3><p>Cảm ơn bạn đã đăng kí tài khoản tại <a href="${clientUrl}">Codezer</a>.</p><p>Để tiếp tục, hãy truy cập liên kết dưới đây: 👇</p><p><a href="${activeUrl}">${activeUrl}</a></p><p>(Lưu ý: Liên kết chỉ có hiệu lực trong 5 phút. Nếu quá thời hạn, hãy đăng kí lại.)</p><h4>Thân ái!</h4>`,
 		})
 
 		return res.json({ message: 'Register successfully' })
