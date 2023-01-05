@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 import { OAuth2Client, TokenPayload } from 'google-auth-library'
 import cookieOptions from '~/config/cookieOptions'
 import User from '~/models/user.model'
+import fetch from 'node-fetch'
 import { generateAccessToken, generateRefreshToken } from '~/utils/token'
 
 const OAUTH_CLIENT_ID = process.env.OAUTH_CLIENT_ID
