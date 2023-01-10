@@ -19,7 +19,7 @@ export default async function create(req: RequestWithAuth, res: Response) {
 		await User.findByIdAndUpdate(req.user._id, { $inc: { scores: 10 } })
 		await blog.save()
 
-		return res.json({ message: 'Create blog successfully' })
+		return res.json({ message: 'Create blog successfully', data: blog })
 	} catch (error: any) {
 		return res.status(500).json({
 			message: error.message,
